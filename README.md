@@ -48,6 +48,12 @@ Parameters controlling the number of signatures (sensitivity) can be tuned by th
 Number of threads used in the algorithm can be tuned by the following:
 - -t, default = 16: number of threads
 
+Output format:
+- -o, default = 'm4': accepting both 'm4' and 'paf'
+
+Optional input file:
+- -i, default = None: overlap detection between two datasets
+
 ## Output format
 Our output is similar to BLASR’s M4 format.
 
@@ -64,8 +70,11 @@ Our output is similar to BLASR’s M4 format.
 11. Overlap end position on sequence 2
 12. Length of sequence 2
 
+We can also generate output in [PAF][PAF_FORMAT] format if given option '-o paf'.
+
 ## Acknowledgement
 We use the [xxHash][XHS] package in smooth q-gram hashing. 
 
 [XHS]: https://github.com/Cyan4973/xxHash
 [CGK]: https://dl.acm.org/citation.cfm?id=2897577
+[PAF_FORMAT]: https://github.com/lh3/miniasm/blob/master/PAF.md
