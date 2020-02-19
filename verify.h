@@ -188,7 +188,7 @@ void join(std::vector<Signature_inter>& htable) {
     if (DEBUG) num_verify_threads = 1;
 
     #pragma omp parallel for schedule(dynamic) num_threads(num_verify_threads)
-    for (int i = 0; i < oridata.size(); i++) {
+    for (int i = 0; i < NUM_READS_DATA1; i++) {
         if (oridata[i].fwrv == 0) {
             double current_cpu_time = omp_get_wtime();
             std::vector<RawMatch> raw_matches;
@@ -204,6 +204,7 @@ void join(std::vector<Signature_inter>& htable) {
                 int begin = begin_iterator - htable.begin();
                 for (int k = begin; k < index_pair.second; k++) {
                     const Signature_inter& s2 = htable[k];
+                    if (NUM_READS_DATA2 != 0 && s2.id < NUM_READS_DATA1) continue;
                     if (edit_early_quit(oridata[i].cstr+s1.location, oridata[s2.id].cstr+s2.location, SIZE_Q, ED_THRESHOLD) != -1) {
                         raw_matches.push_back({s2.id, s1.location, s2.location});
                     }

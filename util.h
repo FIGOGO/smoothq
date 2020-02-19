@@ -220,6 +220,11 @@ double TIME_EXTEND = 0;
 // Output format
 std::string OUT_FORMAT = "m4";
 
+// Optional input file
+std::string OPT_INPUT = "";
+int NUM_READS_DATA1 = 0;
+int NUM_READS_DATA2 = 0;
+
 void print_working_env() {
     fprintf(stderr, "Parameter list: \n");
     fprintf(stderr, "  Q-gram size:         %d \n", SIZE_Q);

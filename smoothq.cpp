@@ -40,7 +40,7 @@ int smoothq_vec() {
 }
 
 int parameter_parsing(int argc, char **argv) {
-    const char *opt_str = "f:r:t:c:q:e:m:o:";
+    const char *opt_str = "f:r:t:c:q:e:m:o:i:";
     int opt;
 
     while ((opt = getopt (argc, argv, opt_str)) != -1)
@@ -74,6 +74,9 @@ int parameter_parsing(int argc, char **argv) {
                     throw std::invalid_argument("Please specify a valid output format: m4 or paf");
                 }
                 break;
+            case 'i':
+                OPT_INPUT = optarg;
+                break;
             case '?':
                 if (isprint (optopt))
                     fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -88,22 +91,14 @@ int parameter_parsing(int argc, char **argv) {
     return 0;
 }
 
-int main(int argc, char **argv)
+int self_join(string filename)
 {
-	if (argc == 0) {
-        fprintf(stderr, "ERROR: Please specify the input file.\n");
-	    return -1;
-	}
-	string filename = argv[1];
-
-	parameter_parsing(argc, argv);
-
-    fprintf(stderr, "Working on data: %s \n", filename.c_str());
 	double starting_time_cpu = get_cpu_time();
 	double starting_time = time(NULL);
 
 	// Read data from input file
 	readfasta(filename);
+	NUM_READS_DATA1 = oridata.size();
 	fprintf(stderr, "Finished reading input file in %f s cpu \n",
 			(get_cpu_time()-starting_time_cpu));
 	fprintf(stderr, "                            in %f s real clock \n",
@@ -123,4 +118,57 @@ int main(int argc, char **argv)
     efficiency_check();
 
 	return 0;
+}
+
+int two_join(std::string filename) {
+    double starting_time_cpu = get_cpu_time();
+    double starting_time = time(NULL);
+
+    // Read data from input file
+    readfasta(filename);
+    NUM_READS_DATA1 = oridata.size();
+    readfasta(OPT_INPUT);
+    NUM_READS_DATA2 = oridata.size() - NUM_READS_DATA1;
+    if (NUM_READS_DATA1 == 0 || NUM_READS_DATA2 == 0) {
+        throw std::range_error("Input dataset is empty");
+    }
+    SINGULAR = 2;
+
+    fprintf(stderr, "total size: %d; num reads 1: %d; num reads 2: %d\n",
+            oridata.size(), NUM_READS_DATA1, NUM_READS_DATA2);
+    fprintf(stderr, "Finished reading input file in %f s cpu \n",
+            (get_cpu_time()-starting_time_cpu));
+    fprintf(stderr, "                            in %f s real clock \n",
+            (time(NULL)-starting_time));
+
+    // Print out parameters used in the program
+    print_working_env();
+
+    // smoothq algorithm with vector based hash table
+    smoothq_vec();
+
+    fprintf(stderr, "Total running time cpu: %f s, real clock %f s \n",
+            get_cpu_time()-starting_time_cpu, time(NULL)-starting_time);
+
+    return 0;
+}
+
+int main(int argc, char **argv) {
+    if (argc == 0) {
+        fprintf(stderr, "ERROR: Please specify the input file.\n");
+        return -1;
+    }
+
+    string filename = argv[1];
+    parameter_parsing(argc, argv);
+
+    if (OPT_INPUT == "") {
+        fprintf(stderr, "Working on data: %s \n", filename.c_str());
+        self_join(filename);
+    } else {
+        fprintf(stderr, "Working on datasets: %s and %s \n",
+                filename.c_str(), OPT_INPUT.c_str());
+        two_join(filename);
+    }
+    return 0;
 }
