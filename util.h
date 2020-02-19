@@ -217,6 +217,9 @@ double TIME_CAL_MATCH = 0;
 double TIME_2nd_CHECK = 0;
 double TIME_EXTEND = 0;
 
+// Output format
+std::string OUT_FORMAT = "m4";
+
 void print_working_env() {
     fprintf(stderr, "Parameter list: \n");
     fprintf(stderr, "  Q-gram size:         %d \n", SIZE_Q);

@@ -40,7 +40,7 @@ int smoothq_vec() {
 }
 
 int parameter_parsing(int argc, char **argv) {
-    const char *opt_str = "f:r:t:c:q:e:m:";
+    const char *opt_str = "f:r:t:c:q:e:m:o:";
     int opt;
 
     while ((opt = getopt (argc, argv, opt_str)) != -1)
@@ -66,6 +66,13 @@ int parameter_parsing(int argc, char **argv) {
                 break;
             case 'm':
                 SIZE_SMQ = atoi(optarg);
+                break;
+            case 'o':
+                OUT_FORMAT = optarg;
+                cout << OUT_FORMAT << endl;
+                if ((OUT_FORMAT!="m4") && (OUT_FORMAT!="paf")) {
+                    throw std::invalid_argument("Please specify a valid output format: m4 or paf");
+                }
                 break;
             case '?':
                 if (isprint (optopt))

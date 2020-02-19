@@ -27,16 +27,41 @@ void output_overlap(int i, int j, Match& xbegin, Match& xend, double density) {
             #pragma omp critical
             NUM_INTO_OUTPUT++;
         }
-        #pragma omp critical
-        std::cout << oridata[i].index
-                  << " " << oridata[j].index
-                  << " " << oridata[i].tag << "_" << oridata[j].tag
-                  << " " << density
-                  << " " << oridata[i].fwrv
-                  << " " << a1 << " " << a2 << " " << oridata[i].len
-                  << " " << oridata[j].fwrv
-                  << " " << b1 << " " << b2 << " " << oridata[j].len
-                  << std::endl;
+
+        if (OUT_FORMAT == "m4") {
+            #pragma omp critical
+            std::cout << oridata[i].index
+                      << " " << oridata[j].index
+                      << " " << oridata[i].tag << "_" << oridata[j].tag
+                      << " " << density
+                      << " " << oridata[i].fwrv
+                      << " " << a1 << " " << a2 << " " << oridata[i].len
+                      << " " << oridata[j].fwrv
+                      << " " << b1 << " " << b2 << " " << oridata[j].len
+                      << std::endl;
+        } else if (OUT_FORMAT == "paf") {
+            std::string relative_fwrv = "";
+            if (oridata[i].fwrv == oridata[j].fwrv) {
+                relative_fwrv = "+";
+            } else {
+                relative_fwrv = "-";
+            }
+            int ovl_length = (int) ((b2-b1 + a2-a1) / 2);
+            int num_matches = (int) (density*ovl_length);
+            #pragma omp critical
+            std::cout << oridata[i].index << '\t'
+                      << oridata[i].len << '\t'
+                      << a1 << '\t'
+                      << a2 << '\t'
+                      << relative_fwrv << '\t'
+                      << oridata[j].index << '\t'
+                      << oridata[j].len << '\t'
+                      << b1 << '\t'
+                      << b2 << '\t'
+                      << num_matches << '\t'
+                      << ovl_length << '\t'
+                      << 255 << std::endl;
+        }
     }
 }
 
